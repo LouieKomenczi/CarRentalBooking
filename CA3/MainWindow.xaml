@@ -5,8 +5,94 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CA3"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="450" Width="800"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResizeWithGrip"
+        MinWidth="700"
+        MinHeight="500"
+        MaxWidth="1024"
+        MaxHeight="768"
         
+        Loaded="Window_Loaded" Foreground="{x:Null}">
+    <Window.Background>
+        <ImageBrush ImageSource="img/bck3.jpg"/>
+    </Window.Background>
+    <Grid VerticalAlignment="Center" Margin="10,10,10,10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="4*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <Label  Grid.Row="0" Grid.Column="0" Content="Car Type" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" Margin="50,10,0,0">
+            <Label.Foreground>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="White" Offset="0"/>
+                    <GradientStop Color="#FF1E1E46" Offset="1"/>
+                </LinearGradientBrush>
+            </Label.Foreground>
+        </Label>
+        <ComboBox x:Name="cbxSize" Grid.Row="0" Grid.Column="1" Height="auto" Width="auto" Margin="10,10,50,10" SelectionChanged="CbxSize_SelectionChanged" Background="#FF88B8E6"/>
+        <Label  Grid.Row="1" Grid.Column="0" Content="Start Date" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" Margin="50,10,0,0">
+            <Label.Foreground>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="White" Offset="0"/>
+                    <GradientStop Color="#FF1E1E46" Offset="1"/>
+                </LinearGradientBrush>
+            </Label.Foreground>
+        </Label>
+        <DatePicker x:Name="dpkStart" Grid.Row="1" Grid.Column="1"  Height="auto" Width="auto" Margin="10,10,50,10" SelectedDateChanged="DpkStart_SelectedDateChanged" Background="#FF88B8E6"/>
+        <Label  Grid.Row="2" Grid.Column="0" Content="End Date" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" Margin="50,10,0,0">
+            <Label.Foreground>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="White" Offset="0"/>
+                    <GradientStop Color="#FF1E1E46" Offset="1"/>
+                </LinearGradientBrush>
+            </Label.Foreground>
+        </Label>
+        <DatePicker x:Name="dpkEnd" Grid.Row="2" Grid.Column="1"  Height="auto" Width="auto" Margin="10,10,50,10" SelectedDateChanged="DpkEnd_SelectedDateChanged" Background="#FF88B8E6"/>
+        <Button x:Name="btnSearch" Grid.Row="3" Grid.Column="1" Height="auto" Width="auto" Margin="10,10,50,5" Content="Search" FontSize="18" FontWeight="Bold" Background="#FF2C4C6B" Click="BtnSearch_Click"/>
+        <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2">
+            <Label  Content="Available Cars" HorizontalAlignment="Center"  VerticalAlignment="Top" FontSize="18" FontWeight="Bold" Margin="0,10,0,0">
+                <Label.Foreground>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="White" Offset="0"/>
+                        <GradientStop Color="#FF1E1E46" Offset="1"/>
+                    </LinearGradientBrush>
+                </Label.Foreground>
+            </Label>
+            <ListBox x:Name="lbxCars" Height="148"  VerticalAlignment="Center"  Margin="50,0" SelectionChanged="LbxCars_SelectionChanged" SelectedValuePath="Id" Background="#FF11314F" Foreground="White" />
+        </StackPanel>
+        <Image x:Name="imgCar" Grid.Row="0" Grid.Column="3" Grid.RowSpan="4" Source="img/car.png" Margin="0,10" MouseRightButtonDown="ImgCar_MouseRightButtonDown">
+            <Image.Effect>
+                <DropShadowEffect Color="#FF010611" BlurRadius="20" ShadowDepth="20"/>
+            </Image.Effect>
+        </Image>
+        <StackPanel Grid.Row="4" Grid.Column="2">
+            <Label  Content="Selected Car" HorizontalAlignment="Left"  VerticalAlignment="Top" FontSize="18" FontWeight="Bold" Margin="50,10,0,0">
+                <Label.Foreground>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="White" Offset="0"/>
+                        <GradientStop Color="#FF1E1E46" Offset="1"/>
+                    </LinearGradientBrush>
+                </Label.Foreground>
+            </Label>
+            <ListBox x:Name="lbxSelected" Height="52" Background="{x:Null}" Foreground="White" BorderBrush="{x:Null}" Margin="50,0,0,0" HorizontalAlignment="Left"/>
+            <ListBox x:Name="lbxSelectedDate" Height="50
+                     " VerticalAlignment="Top" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="White" Margin="50,0,0,0" HorizontalAlignment="Left"/>
+        </StackPanel>
+        <StackPanel Grid.Row="5" Grid.Column="2" Orientation="Horizontal">
+            <Button x:Name="btnTaken" Content="Taken" Click="Button_Click" Visibility="Hidden" />
+            <Button x:Name="btnView" Content="View Bookings" HorizontalAlignment="Right" FontSize="18" FontWeight="Bold" Margin="50,0,0,0" Click="BtnView_Click" Visibility="Hidden"/>
+            <Button x:Name="btnBook" VerticalAlignment="Bottom" HorizontalAlignment="Right" Content="Book" Margin="50,0,20,0" FontSize="18" FontWeight="Bold" Click="BtnBook_Click" Height="44" Width="70" Background="#FF2C4C6B" />
+        </StackPanel>
+
     </Grid>
 </Window>
