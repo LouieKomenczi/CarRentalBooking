@@ -10,10 +10,10 @@ namespace CA3
     {
         public override string ToString()
         {
-            //return  "Car ID: "+Id + "\n"+
-            //        "Make: "+Make + "\n" + 
-            //        "Model: "+ Model;
-            return Make + "-" + Model;
+            return "Car ID: " + Id + "\n" +
+                    "Make: " + Make + "\n" +
+                    "Model: " + Model;
+            //return Make + "-" + Model;
         }
 
     }

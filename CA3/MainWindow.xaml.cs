@@ -41,11 +41,13 @@ namespace CA3
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
+            //setting the datepicker available only for future dates
+            dpkStart.DisplayDateStart = DateTime.Now;
+            dpkEnd.DisplayDateStart = DateTime.Now;
         }
 
         private void BtnSearch_Click(object sender, RoutedEventArgs e)
-        {//if the search buton is clicked
+        {            
             string selectedValue="";
             //check is size was selected
             if (cbxSize.SelectedIndex != -1)
@@ -66,7 +68,7 @@ namespace CA3
                 {
 
                 }
-                if (startDate < endDate) // a valid date selection 
+                if (startDate < endDate) // a valid date selection, start has to be before return date
                 {
                     //select the cars in the selected size
                     var query = (from c in db.Cars
@@ -74,23 +76,19 @@ namespace CA3
                                 select c).ToList();
 
                     if (selectedValue == "All")
-                    {//select all the cars, all sizes
+                    {
+                        //select all the cars, all sizes
                         query = (from c in db.Cars
                                  select c).ToList();
                     }
                     //select the cars that are not available for the required period
                     var query2 = (from b in db.Bookings
                                   join c in db.Cars on b.CarId equals c.Id
-                                  where (((startDate >= b.StartDate) && (endDate <=b.EndDate ))||
-                                            ((startDate<b.StartDate) && (endDate >b.StartDate))||
-                                            ((startDate<b.EndDate)&&(endDate > b.EndDate)))                                            
-                                  select new Mycar
-                                  {
-                                      Id = c.Id,
-                                      Make = c.Make,
-                                      Model = c.Model,
-                                      Size = c.Size
-                                  }).ToList();
+                                  where (((startDate >= b.StartDate) && (endDate <= b.EndDate)) ||
+                                            ((startDate < b.StartDate) && (endDate > b.StartDate)) ||
+                                            ((startDate < b.EndDate) && (endDate > b.EndDate)))
+                                  select c).ToList();
+             
                     //substract from the availability list the cars that are allready booked
                     for(int i=0; i<query.Count; i++)
                     {
@@ -100,12 +98,13 @@ namespace CA3
                                 query.Remove(query[i]);
                             }
                         if (query.Count == 0) MessageBox.Show("All cars booked for the selected dates and size!");
-                    }    
-                    //load the car list 
+                    }
+                    //load the car list                                
                     lbxCars.ItemsSource = query.ToList();
                 }
                 else
-                {//invalid date selection 
+                {
+                    //invalid date selection 
                     MessageBox.Show("Start date has to be before end date!");
                 }
 
@@ -116,48 +115,49 @@ namespace CA3
         }
 
         private void LbxCars_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {//selecting a car from the availability list
+        {
+            //selecting a car from the availability list
             if (lbxCars.SelectedIndex != -1)
-            {//car selected, getting the name and model                
-                lbxSelected.ItemsSource = lbxCars.SelectedItems;               
+            {
+                //car selected, getting the name and model                
+                tbxSelected.Text=lbxCars.SelectedItem +"\nRendal Date:"+ dpkStart.Text+"\nReturn Date:" + dpkEnd.Text;   
+                //set CarId to be availabal when saving the booking
                 CarId = (int)lbxCars.SelectedValue;
-                List<string> dates = new List<string>();
-                dates.Add(dpkStart.Text);
-                dates.Add(dpkEnd.Text);
-                lbxSelectedDate.ItemsSource = dates;
             }     
             
         }
 
         private void BtnBook_Click(object sender, RoutedEventArgs e)
         {
+            //check if car was selected, CarId is set only after valid selection
             if (CarId != -1)
             {
+                //get the dates
                 DateTime startDate = (DateTime)dpkStart.SelectedDate;
                 DateTime endDate = (DateTime)dpkEnd.SelectedDate;
+                //create booking item with dates and carid
                 Booking booking = new Booking()
                 {
                     StartDate = startDate,
                     EndDate = endDate,
                     CarId = CarId
                 };
+                //add booking to db and save
                 db.Bookings.Add(booking);
                 db.SaveChanges();
+                //prep the details for confirm message
                 var query = from c in db.Cars
                             where c.Id == CarId
-                            select new Mycar
-                            {
-                                Id = c.Id,
-                                Make = c.Make,
-                                Model = c.Model
-                            };
-                Mycar car = new Mycar();
+                            select c;
+                Car car = new Car();
                 car = query.FirstOrDefault();
                 MessageBox.Show("Booking Confirmation \n\n" +car +"\nStart Date:"+ startDate.ToString("dd/MM/yyyy") +
                                 "\nReturn Date: " + endDate.Date.ToString("dd/MM/yyyy"));
+                //clearing selection
                 ResetSelection();
             }
             else
+                //in case booking is pressed without vaid selection
                 MessageBox.Show("Select an available car!");
             
 
@@ -165,29 +165,33 @@ namespace CA3
 
         private void DpkStart_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
+            //if selection change reset available car list
             ResetSelection();
         }
 
         private void DpkEnd_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
+            //if selection change reset available car list
             ResetSelection();
         }
 
         private void CbxSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            //if selection change reset available car list
             ResetSelection();
         }
 
         public void ResetSelection()
         {
+            //reset the available cars and selected car 
             lbxCars.ItemsSource = null;
-            lbxSelected.ItemsSource = null;
-            lbxSelectedDate.ItemsSource = null;
+            tbxSelected.Text = null;
         }
 
-
+        #region stuff for testing 
         private void BtnView_Click(object sender, RoutedEventArgs e)
         {
+            //display the bookings from the db - hidden on start - right click on car photo to activate
             Window1 secondWindow = new Window1();
             secondWindow.Owner = this;
             secondWindow.Show();
@@ -199,6 +203,8 @@ namespace CA3
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            
+            //THIS IS A TEST THIS IS A TEST THIS IS A TEST - access hidden on start up - - right click on car photo to activate
             string selectedValue = "";
             if (cbxSize.SelectedIndex != -1)
             {
@@ -254,26 +260,25 @@ namespace CA3
             else
                 MessageBox.Show("Please select car size!");
 
-
+            
         }
 
         private void ImgCar_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            btnView.Visibility = Visibility.Visible;
-            btnTaken.Visibility = Visibility.Visible;
+            //making visible/hidden the 2 butons used for test purposes - right click on photo
+            if (btnView.IsVisible)
+            {
+                btnView.Visibility = Visibility.Hidden;
+                btnTaken.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                btnView.Visibility = Visibility.Visible;
+                btnTaken.Visibility = Visibility.Visible;
+            }     
+
+            
         }
+        #endregion
     }
-
-    //this class is creared so I can use it in LINQ to create car objects, and use a second type of ToString methode
-    public class Mycar : Car
-    {
-        public override string ToString()
-        {
-            return "Car ID: "+Id+
-                    "\nMake: "+Make+
-                    "\nModel:"+Model;
-        }
-    }
-
-
 }
